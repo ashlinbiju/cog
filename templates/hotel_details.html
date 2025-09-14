@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Details - Hotel Recommendation System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <style>
+        .hotel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .hotel-image {
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+        
+        .rating-display {
+            font-size: 1.2rem;
+            color: #ffc107;
+        }
+        
+        .amenity-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nearby-attraction {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .nearby-attraction:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .review-card {
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .star-rating {
+            color: #ffc107;
+            font-size: 1.1rem;
+        }
+        
+        .price-level {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">🏨 Hotel Recommendations</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/recommendations">My Recommendations</a>
+                <a class="nav-link" href="#" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="hotelDetails">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Loading hotel details...</p>
+        </div>
+    </div>
+
+    <!-- Hotel Details Template -->
+    <div id="hotelDetailsTemplate" class="d-none">
+        <div class="hotel-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 id="hotelName" class="display-5 fw-bold"></h1>
+                        <p id="hotelAddress" class="lead mb-2"></p>
+                        <div class="d-flex align-items-center">
+                            <div id="hotelRating" class="rating-display me-3"></div>
+                            <span id="hotelReviewCount" class="text-light"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div id="hotelPriceLevel" class="price-level"></div>
+                        <div id="hotelPriceRange" class="text-light"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <!-- Hotel Images -->
+                    <div id="hotelImages" class="mb-4">
+                        <div id="hotelCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner" id="carouselImages">
+                                <!-- Images will be populated here -->
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#hotelCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#hotelCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hotel Description -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title">About This Hotel</h3>
+                            <p id="hotelDescription" class="card-text"></p>
+                        </div>
+                    </div>
+
+                    <!-- Amenities -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title">Amenities</h3>
+                            <div id="hotelAmenities">
+                                <!-- Amenities will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title">Location & Map</h3>
+                            <div id="map" class="map-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Nearby Attractions -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title">Nearby Attractions</h3>
+                            <div id="nearbyAttractions">
+                                <div class="text-center">
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                    <span class="ms-2">Loading nearby attractions...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Section -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="card-title mb-0">Reviews</h3>
+                                <button class="btn btn-primary" id="writeReviewBtn">Write a Review</button>
+                            </div>
+                            <div id="hotelReviews">
+                                <!-- Reviews will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Quick Info -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Quick Info</h5>
+                            <div id="hotelQuickInfo">
+                                <!-- Quick info will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Contact</h5>
+                            <div id="hotelContact">
+                                <!-- Contact info will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation Actions -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Actions</h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" id="bookHotelBtn">Book Now</button>
+                                <button class="btn btn-outline-primary" id="addToFavoritesBtn">Add to Favorites</button>
+                                <button class="btn btn-outline-secondary" id="shareHotelBtn">Share Hotel</button>
+                                <button class="btn btn-outline-info" id="getSimilarBtn">Find Similar Hotels</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Write a Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reviewForm">
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <div class="rating-stars">
+                                <span class="star" data-rating="1">⭐</span>
+                                <span class="star" data-rating="2">⭐</span>
+                                <span class="star" data-rating="3">⭐</span>
+                                <span class="star" data-rating="4">⭐</span>
+                                <span class="star" data-rating="5">⭐</span>
+                            </div>
+                            <input type="hidden" id="reviewRating" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reviewComment" class="form-label">Your Review</label>
+                            <textarea class="form-control" id="reviewComment" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login Required</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please login to write a review.</p>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginUsername" class="form-label">Username or Email</label>
+                            <input type="text" class="form-control" id="loginUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let map;
+        let hotelData = null;
+        
+        // Initialize Google Map
+        function initMap() {
+            // Default location (will be updated when hotel data loads)
+            const defaultLocation = { lat: 40.7128, lng: -74.0060 };
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: defaultLocation,
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'on' }]
+                    }
+                ]
+            });
+        }
+        
+        // Load hotel details
+        async function loadHotelDetails() {
+            const hotelId = window.location.pathname.split('/').pop();
+            
+            try {
+                const response = await fetch(`/api/hotels/${hotelId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    hotelData = await response.json();
+                    displayHotelDetails(hotelData);
+                    updateMap(hotelData);
+                    loadNearbyAttractions(hotelData.latitude, hotelData.longitude);
+                } else {
+                    document.getElementById('hotelDetails').innerHTML = `
+                        <div class="alert alert-danger">
+                            <h4>Hotel Not Found</h4>
+                            <p>The requested hotel could not be found.</p>
+                            <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading hotel details:', error);
+                document.getElementById('hotelDetails').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h4>Error Loading Hotel</h4>
+                        <p>There was an error loading the hotel details. Please try again.</p>
+                        <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+                    </div>
+                `;
+            }
+        }
+        
+        // Display hotel details
+        function displayHotelDetails(hotel) {
+            document.getElementById('hotelName').textContent = hotel.name;
+            document.getElementById('hotelAddress').textContent = hotel.address;
+            document.getElementById('hotelRating').innerHTML = generateStarRating(hotel.rating);
+            document.getElementById('hotelReviewCount').textContent = `(${hotel.review_count || 0} reviews)`;
+            document.getElementById('hotelPriceLevel').textContent = '$'.repeat(hotel.price_level || 2);
+            document.getElementById('hotelPriceRange').textContent = getPriceRange(hotel.price_level);
+            document.getElementById('hotelDescription').textContent = hotel.description || 'No description available.';
+            
+            // Display amenities
+            const amenitiesContainer = document.getElementById('hotelAmenities');
+            if (hotel.amenities && hotel.amenities.length > 0) {
+                amenitiesContainer.innerHTML = hotel.amenities.map(amenity => 
+                    `<span class="amenity-badge">${amenity}</span>`
+                ).join('');
+            } else {
+                amenitiesContainer.innerHTML = '<p class="text-muted">No amenities listed.</p>';
+            }
+            
+            // Display hotel images
+            displayHotelImages(hotel.photos || []);
+            
+            // Display quick info
+            displayQuickInfo(hotel);
+            
+            // Display contact info
+            displayContactInfo(hotel);
+            
+            // Display reviews
+            displayReviews(hotel.reviews || []);
+            
+            // Show the hotel details template
+            document.getElementById('hotelDetails').innerHTML = '';
+            document.getElementById('hotelDetailsTemplate').classList.remove('d-none');
+            document.getElementById('hotelDetails').appendChild(document.getElementById('hotelDetailsTemplate'));
+        }
+        
+        // Generate star rating HTML
+        function generateStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            let html = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                html += '⭐';
+            }
+            if (hasHalfStar) {
+                html += '⭐';
+            }
+            html += ` ${rating.toFixed(1)}`;
+            
+            return html;
+        }
+        
+        // Get price range text
+        function getPriceRange(priceLevel) {
+            const ranges = {
+                1: 'Budget ($)',
+                2: 'Moderate ($$)',
+                3: 'Expensive ($$$)',
+                4: 'Very Expensive ($$$$)'
+            };
+            return ranges[priceLevel] || 'Price not available';
+        }
+        
+        // Display hotel images
+        function displayHotelImages(photos) {
+            const carouselContainer = document.getElementById('carouselImages');
+            
+            if (photos.length === 0) {
+                carouselContainer.innerHTML = `
+                    <div class="carousel-item active">
+                        <div class="hotel-image bg-light d-flex align-items-center justify-content-center">
+                            <span class="text-muted">No images available</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            carouselContainer.innerHTML = photos.map((photo, index) => `
+                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                    <img src="${photo}" class="d-block w-100 hotel-image" alt="Hotel photo ${index + 1}">
+                </div>
+            `).join('');
+        }
+        
+        // Display quick info
+        function displayQuickInfo(hotel) {
+            const quickInfoContainer = document.getElementById('hotelQuickInfo');
+            quickInfoContainer.innerHTML = `
+                <div class="mb-2"><strong>Check-in:</strong> ${hotel.checkin_time || '3:00 PM'}</div>
+                <div class="mb-2"><strong>Check-out:</strong> ${hotel.checkout_time || '11:00 AM'}</div>
+                <div class="mb-2"><strong>Pet Policy:</strong> ${hotel.pet_friendly ? 'Pet-friendly' : 'No pets allowed'}</div>
+                <div class="mb-2"><strong>Parking:</strong> ${hotel.parking_available ? 'Available' : 'Not available'}</div>
+                <div class="mb-2"><strong>WiFi:</strong> ${hotel.wifi_available ? 'Free WiFi' : 'No WiFi'}</div>
+            `;
+        }
+        
+        // Display contact info
+        function displayContactInfo(hotel) {
+            const contactContainer = document.getElementById('hotelContact');
+            contactContainer.innerHTML = `
+                ${hotel.phone ? `<div class="mb-2"><strong>Phone:</strong> <a href="tel:${hotel.phone}">${hotel.phone}</a></div>` : ''}
+                ${hotel.website ? `<div class="mb-2"><strong>Website:</strong> <a href="${hotel.website}" target="_blank">Visit Website</a></div>` : ''}
+                <div class="mb-2"><strong>Address:</strong> ${hotel.address}</div>
+            `;
+        }
+        
+        // Display reviews
+        function displayReviews(reviews) {
+            const reviewsContainer = document.getElementById('hotelReviews');
+            
+            if (reviews.length === 0) {
+                reviewsContainer.innerHTML = '<p class="text-muted">No reviews yet. Be the first to write a review!</p>';
+                return;
+            }
+            
+            reviewsContainer.innerHTML = reviews.map(review => `
+                <div class="review-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <strong>${review.user_name || 'Anonymous'}</strong>
+                            <div class="star-rating">${generateStarRating(review.rating)}</div>
+                        </div>
+                        <small class="text-muted">${new Date(review.created_at).toLocaleDateString()}</small>
+                    </div>
+                    <p class="mb-0">${review.comment}</p>
+                </div>
+            `).join('');
+        }
+        
+        // Update map with hotel location
+        function updateMap(hotel) {
+            if (!map || !hotel.latitude || !hotel.longitude) return;
+            
+            const hotelLocation = { lat: hotel.latitude, lng: hotel.longitude };
+            
+            map.setCenter(hotelLocation);
+            
+            // Add hotel marker
+            new google.maps.Marker({
+                position: hotelLocation,
+                map: map,
+                title: hotel.name,
+                icon: {
+                    url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                }
+            });
+        }
+        
+        // Load nearby attractions
+        async function loadNearbyAttractions(lat, lng) {
+            try {
+                const response = await fetch(`/api/google/nearby-attractions?lat=${lat}&lng=${lng}&radius=1000`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const attractions = await response.json();
+                    displayNearbyAttractions(attractions);
+                } else {
+                    document.getElementById('nearbyAttractions').innerHTML = 
+                        '<p class="text-muted">Unable to load nearby attractions.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading nearby attractions:', error);
+                document.getElementById('nearbyAttractions').innerHTML = 
+                    '<p class="text-muted">Error loading nearby attractions.</p>';
+            }
+        }
+        
+        // Display nearby attractions
+        function displayNearbyAttractions(attractions) {
+            const container = document.getElementById('nearbyAttractions');
+            
+            if (!attractions || attractions.length === 0) {
+                container.innerHTML = '<p class="text-muted">No nearby attractions found.</p>';
+                return;
+            }
+            
+            container.innerHTML = attractions.map(attraction => `
+                <div class="nearby-attraction">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">${attraction.name}</h6>
+                            <p class="text-muted mb-1">${attraction.types ? attraction.types.join(', ') : 'Attraction'}</p>
+                            <small class="text-muted">${attraction.distance || 'Distance unknown'}</small>
+                        </div>
+                        <div class="text-end">
+                            ${attraction.rating ? `<div class="star-rating">${generateStarRating(attraction.rating)}</div>` : ''}
+                            ${attraction.price_level ? `<div class="text-muted">${'$'.repeat(attraction.price_level)}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHotelDetails();
+            
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('access_token');
+                window.location.href = '/login';
+            });
+        });
+    </script>
+</body>
+</html>

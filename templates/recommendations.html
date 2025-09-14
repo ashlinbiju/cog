@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Recommendations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .hotel-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .hotel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .hotel-img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .rating {
+            color: #f8d64e;
+        }
+        .price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #198754;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">HotelFinder</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">My Profile</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-light">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2>Recommended Hotels For You</h2>
+                <p class="text-muted">Based on your preferences and past activity</p>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                    <input type="text" class="form-control" id="locationSearch" placeholder="Enter city or location..." 
+                           onkeypress="handleLocationSearch(event)">
+                    <button class="btn btn-outline-secondary" type="button" onclick="searchLocation()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="priceFilter">
+                    <option value="">Price Range</option>
+                    <option value="budget">Budget ($50-$100)</option>
+                    <option value="mid-range">Mid-range ($100-$200)</option>
+                    <option value="luxury">Luxury ($200-$400)</option>
+                    <option value="premium">Premium ($400+)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="ratingFilter">
+                    <option value="">Min Rating</option>
+                    <option value="4.5">4.5+ Stars</option>
+                    <option value="4.0">4.0+ Stars</option>
+                    <option value="3.5">3.5+ Stars</option>
+                    <option value="3.0">3.0+ Stars</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="sortFilter">
+                    <option value="relevance">Sort by Relevance</option>
+                    <option value="price_low">Price: Low to High</option>
+                    <option value="price_high">Price: High to Low</option>
+                    <option value="rating">Rating: High to Low</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+
+        <!-- Hotel Listings -->
+        <div class="row" id="hotelList">
+            <!-- Hotel cards will be dynamically loaded here -->
+            <div class="col-12 text-center my-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Finding the best hotels for you...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>HotelFinder</h5>
+                    <p class="text-muted">Find your perfect stay with personalized recommendations.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-muted">About Us</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Contact</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Connect With Us</h6>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-dark"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-dark"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-dark"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center text-muted">
+                    <small>&copy; 2025 HotelFinder. All rights reserved.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading hotels
+            setTimeout(loadHotels, 1500);
+            
+            // Add event listeners for filters
+            document.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', function() {
+                    console.log('Filter changed:', this.id, this.value);
+                });
+            });
+
+            // Load user preferences and set default filters
+            loadUserPreferences();
+        });
+        
+        async function loadHotels() {
+            try {
+                console.log('[DEBUG] Starting loadHotels function');
+                
+                // Get auth token
+                const authToken = localStorage.getItem('authToken');
+                console.log('[DEBUG] Auth token exists:', !!authToken);
+                
+                if (!authToken) {
+                    console.log('[DEBUG] No auth token, redirecting to login');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Get current user info
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const userId = currentUser.id || 11; // fallback to user ID 11
+                console.log('[DEBUG] Current user:', currentUser);
+                console.log('[DEBUG] Using user ID:', userId);
+
+                // Get selected location from search input
+                const locationInput = document.getElementById('locationSearch');
+                const selectedLocation = locationInput ? locationInput.value.trim() : '';
+
+                console.log('[DEBUG] Loading personalized recommendations for user:', userId);
+                console.log('[DEBUG] Selected location:', selectedLocation);
+
+                // Get filter values
+                const filters = getFilterValues();
+                const queryParams = new URLSearchParams({
+                    location: selectedLocation,
+                    limit: 12,
+                    ...filters
+                });
+
+                const apiUrl = `/api/smart/personalized/${userId}?${queryParams}`;
+                console.log('[DEBUG] API URL:', apiUrl);
+
+                // Call smart recommendations API
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('[DEBUG] API Response status:', response.status);
+                console.log('[DEBUG] API Response ok:', response.ok);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[ERROR] Failed to load recommendations:', response.status, errorText);
+                    // Fallback to trending hotels
+                    return loadTrendingHotels(selectedLocation);
+                }
+
+                const data = await response.json();
+                console.log('[DEBUG] Received recommendations data:', data);
+
+                const hotels = data.recommendations || [];
+                console.log('[DEBUG] Number of hotels received:', hotels.length);
+                displayHotels(hotels, 'personalized');
+
+            } catch (error) {
+                console.error('Error loading hotels:', error);
+                // Fallback to trending hotels
+                loadTrendingHotels();
+            }
+        }
+
+        async function loadTrendingHotels(location = '') {
+            try {
+                console.log('Loading trending hotels for location:', location);
+                
+                const response = await fetch(`/api/smart/trending?location=${encodeURIComponent(location)}&limit=12`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const hotels = data.trending_hotels || [];
+                    displayHotels(hotels, 'trending');
+                } else {
+                    // Ultimate fallback to sample data
+                    const sampleHotels = [
+                        {
+                            hotel: {
+                                name: "Luxury Bay View Hotel",
+                                location: "San Francisco, CA",
+                                rating: 4.8,
+                                total_reviews: 245,
+                                price_range: "luxury"
+                            },
+                            method: 'sample'
+                        },
+                        {
+                            hotel: {
+                                name: "Downtown Grand Hotel", 
+                                location: "New York, NY",
+                                rating: 4.5,
+                                total_reviews: 189,
+                                price_range: "mid-range"
+                            },
+                            method: 'sample'
+                        }
+                    ];
+                    displayHotels(sampleHotels, 'sample');
+                }
+            } catch (error) {
+                console.error('Error loading trending hotels:', error);
+                displayNoResults();
+            }
+        }
+
+        function displayHotels(hotels, source) {
+            const hotelList = document.getElementById('hotelList');
+            hotelList.innerHTML = '';
+            
+            if (!hotels || hotels.length === 0) {
+                displayNoResults();
+                return;
+            }
+
+            // Add source indicator
+            const sourceIndicator = `
+                <div class="col-12 mb-3">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Showing ${source === 'personalized' ? 'personalized recommendations based on your preferences' : 
+                                 source === 'trending' ? 'trending hotels' : 'sample hotels'}
+                        ${source === 'personalized' ? ' (Collaborative Filtering + Content-Based + Google Maps)' : ''}
+                    </div>
+                </div>
+            `;
+            hotelList.insertAdjacentHTML('beforeend', sourceIndicator);
+            
+            hotels.forEach((hotelData, index) => {
+                // Handle different data structures
+                const hotel = hotelData.hotel || hotelData;
+                const method = hotelData.method || source;
+                const score = hotelData.final_score || hotelData.content_score || hotelData.predicted_rating || 0;
+                const reasons = hotelData.reasons || [];
+                
+                // Generate hotel image (fallback to placeholder)
+                const hotelImage = hotel.image || getHotelPlaceholderImage(hotel.name, index);
+                
+                // Format price
+                const price = hotel.price || getPriceFromRange(hotel.price_range) || 'N/A';
+                
+                // Format rating
+                const rating = hotel.rating || 0;
+                const totalReviews = hotel.total_reviews || 0;
+                
+                // Create recommendation badge
+                const methodBadge = getMethodBadge(method);
+                
+                const hotelCard = `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card hotel-card h-100">
+                            ${methodBadge}
+                            <img src="${hotelImage}" class="card-img-top hotel-img" alt="${hotel.name}" 
+                                 onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">${hotel.name}</h5>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-1">${rating.toFixed(1)}</span>
+                                        <i class="fas fa-star rating"></i>
+                                        ${totalReviews > 0 ? `<small class="text-muted ms-1">(${totalReviews})</small>` : ''}
+                                    </div>
+                                </div>
+                                <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>${hotel.location}</p>
+                                
+                                ${reasons.length > 0 ? `
+                                    <div class="mb-2">
+                                        <small class="text-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            ${reasons.slice(0, 2).join(', ')}
+                                        </small>
+                                    </div>
+                                ` : ''}
+                                
+                                ${score > 0 ? `
+                                    <div class="mb-2">
+                                        <small class="text-info">
+                                            <i class="fas fa-chart-line me-1"></i>
+                                            Match Score: ${score.toFixed(1)}
+                                        </small>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="price">
+                                        ${price !== 'N/A' ? `$${price}<small class="text-muted">/night</small>` : 
+                                          `<span class="badge bg-secondary">${hotel.price_range || 'Price varies'}</span>`}
+                                    </div>
+                                    <a href="/hotel/${hotel.id || hotelData.hotel_id}" class="btn btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                hotelList.insertAdjacentHTML('beforeend', hotelCard);
+            });
+        }
+
+        function displayNoResults() {
+            const hotelList = document.getElementById('hotelList');
+            hotelList.innerHTML = `
+                <div class="col-12 text-center my-5">
+                    <i class="fas fa-hotel fa-3x text-muted mb-3"></i>
+                    <h4>No hotels found</h4>
+                    <p class="text-muted">Try adjusting your search criteria or location.</p>
+                    <button class="btn btn-primary" onclick="loadTrendingHotels()">Show Trending Hotels</button>
+                </div>
+            `;
+        }
+
+        function getMethodBadge(method) {
+            const badges = {
+                'collaborative_filtering': '<span class="badge bg-primary position-absolute top-0 start-0 m-2">Recommended for You</span>',
+                'content_based': '<span class="badge bg-success position-absolute top-0 start-0 m-2">Matches Preferences</span>',
+                'google_maps': '<span class="badge bg-info position-absolute top-0 start-0 m-2">Nearby</span>',
+                'trending': '<span class="badge bg-warning position-absolute top-0 start-0 m-2">Trending</span>',
+                'personalized': '<span class="badge bg-primary position-absolute top-0 start-0 m-2">Personalized</span>',
+                'sample': '<span class="badge bg-secondary position-absolute top-0 start-0 m-2">Sample</span>',
+                'fallback': '<span class="badge bg-light text-dark position-absolute top-0 start-0 m-2">Featured</span>'
+            };
+            return badges[method] || '';
+        }
+
+        function getHotelPlaceholderImage(hotelName, index) {
+            const images = [
+                'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+            ];
+            return images[index % images.length];
+        }
+
+        function getPriceFromRange(priceRange) {
+            const prices = {
+                'budget': 89,
+                'mid-range': 159,
+                'luxury': 299,
+                'premium': 449
+            };
+            return prices[priceRange] || null;
+        }
+
+        function handleLocationSearch(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                searchLocation();
+            }
+        }
+
+        function searchLocation() {
+            const locationInput = document.getElementById('locationSearch');
+            const location = locationInput.value.trim();
+            
+            if (location) {
+                console.log('Searching for hotels in:', location);
+                loadHotels();
+            }
+        }
+
+        function getFilterValues() {
+            return {
+                price_range: document.getElementById('priceFilter').value,
+                min_rating: document.getElementById('ratingFilter').value,
+                sort_by: document.getElementById('sortFilter').value
+            };
+        }
+
+        function applyFilters() {
+            console.log('Applying filters...');
+            loadHotels();
+        }
+
+        function loadUserPreferences() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const preferences = currentUser.preferences || {};
+                
+                console.log('Loading user preferences:', preferences);
+                
+                // Set default location if user has one
+                if (preferences.location) {
+                    const locationInput = document.getElementById('locationSearch');
+                    if (locationInput) {
+                        locationInput.value = preferences.location;
+                    }
+                }
+                
+                // Set default price range based on budget preference
+                if (preferences.budget) {
+                    const priceFilter = document.getElementById('priceFilter');
+                    if (priceFilter) {
+                        priceFilter.value = preferences.budget;
+                    }
+                }
+                
+                // Set default rating filter
+                if (preferences.min_rating) {
+                    const ratingFilter = document.getElementById('ratingFilter');
+                    if (ratingFilter) {
+                        ratingFilter.value = preferences.min_rating;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error loading user preferences:', error);
+            }
+        }
+    </script>
+</body>
+</html>

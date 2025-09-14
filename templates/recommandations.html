@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recommendations - Hotel Recommendation System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="/">🏨 Hotel Recommendations</a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link active" href="/recommendations">My Recommendations</a>
+                    <a class="nav-link" href="#" id="loginLink">Login</a>
+                    <a class="nav-link d-none" href="#" id="logoutLink">Logout</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <div id="loginRequired" class="alert alert-warning">
+                <h4>Login Required</h4>
+                <p>Please login to view your personalized recommendations.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+            </div>
+
+            <div id="recommendationsContent" class="d-none">
+                <div class="row">
+                    <div class="col-md-9">
+                        <h1>Your Personalized Recommendations</h1>
+                        <p class="text-muted">Based on your preferences and review history</p>
+
+                        <!-- Recommendation Method Selector -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5>Recommendation Method</h5>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-primary active" data-method="hybrid">Hybrid</button>
+                                    <button type="button" class="btn btn-outline-primary" data-method="user_based">User-Based</button>
+                                    <button type="button" class="btn btn-outline-primary" data-method="item_based">Item-Based</button>
+                                    <button type="button" class="btn btn-outline-primary" data-method="content_based">Content-Based</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommendations List -->
+                        <div id="recommendationsList">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status"></div>
+                                <p>Loading recommendations...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>👤 Your Profile</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="userProfile">
+                                    <p>Loading profile...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5>📝 Your Reviews</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="userReviews">
+                                    <p>Loading reviews...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Modal (same as in index.html) -->
+            <div class="modal fade" id="loginModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Login</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label for="loginUsername" class="form-label">Username or Email</label>
+                                    <input type="text" class="form-control" id="loginUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="loginPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="loginPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

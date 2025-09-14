@@ -1,0 +1,92 @@
+[
+  {
+    "user_id": 1,
+    "hotel_id": 1,
+    "rating": 5,
+    "comment": "Absolutely fantastic stay! The service was exceptional and the rooms were luxurious. The view from my room was breathtaking. Highly recommended for anyone visiting New York."
+  },
+  {
+    "user_id": 2,
+    "hotel_id": 1,
+    "rating": 4,
+    "comment": "Great location and very professional staff. The hotel is well-maintained and the amenities are top-notch. Only minor complaint was the noise from the street at night."
+  },
+  {
+    "user_id": 3,
+    "hotel_id": 2,
+    "rating": 5,
+    "comment": "Perfect beach getaway! The resort exceeded all expectations. Beautiful beach, amazing pool area, and the spa treatments were incredible. Will definitely return."
+  },
+  {
+    "user_id": 1,
+    "hotel_id": 2,
+    "rating": 4,
+    "comment": "Lovely resort with great facilities. The beach access is convenient and the restaurant serves excellent food. Good value for a luxury resort."
+  },
+  {
+    "user_id": 4,
+    "hotel_id": 3,
+    "rating": 4,
+    "comment": "Excellent for business trips. The meeting rooms are well-equipped and the location is very convenient for downtown Chicago. Staff was helpful throughout my stay."
+  },
+  {
+    "user_id": 5,
+    "hotel_id": 4,
+    "rating": 5,
+    "comment": "What a gem! The mountain views are spectacular and the lodge has such a cozy atmosphere. Perfect for a weekend getaway from the city."
+  },
+  {
+    "user_id": 2,
+    "hotel_id": 5,
+    "rating": 3,
+    "comment": "Basic but clean accommodation. Good value for money. The breakfast was decent and the staff was friendly. Perfect for budget travelers."
+  },
+  {
+    "user_id": 3,
+    "hotel_id": 6,
+    "rating": 5,
+    "comment": "Stunning ocean views and spacious suites! The kitchen facilities were very convenient. Beach access was perfect and the pool area was beautiful."
+  },
+  {
+    "user_id": 4,
+    "hotel_id": 7,
+    "rating": 4,
+    "comment": "Charming historic hotel with character. The location is perfect for exploring Boston. Rooms are comfortable and the restaurant serves excellent food."
+  },
+  {
+    "user_id": 1,
+    "hotel_id": 8,
+    "rating": 4,
+    "comment": "Modern and efficient hotel perfect for business travelers. High-speed internet worked flawlessly and the business center had everything I needed."
+  },
+  {
+    "user_id": 5,
+    "hotel_id": 1,
+    "rating": 3,
+    "comment": "Nice hotel but overpriced for what you get. The service was good but the rooms felt dated despite the luxury branding."
+  },
+  {
+    "user_id": 4,
+    "hotel_id": 2,
+    "rating": 5,
+    "comment": "Amazing beach resort! The staff went above and beyond to make our vacation special. The spa was incredible and the food was outstanding."
+  },
+  {
+    "user_id": 2,
+    "hotel_id": 3,
+    "rating": 4,
+    "comment": "Solid business hotel with good amenities. The gym was well-equipped and the breakfast buffet had good variety. Would stay again."
+  },
+  {
+    "user_id": 1,
+    "hotel_id": 4,
+    "rating": 5,
+    "comment": "Absolutely loved this lodge! The mountain setting is peaceful and the rooms are cozy. Great hiking trails nearby and the restaurant serves delicious local cuisine."
+  },
+  {
+    "user_id": 3,
+    "hotel_id": 5,
+    "rating": 4,
+    "comment": "Good budget option with clean rooms and friendly staff. The location is convenient and parking was easy. Great value for the price."
+  }
+]

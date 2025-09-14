@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hotel Recommendations</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .location-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .location-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .location-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .quick-search-btn {
+            margin: 5px;
+            border-radius: 20px;
+        }
+        
+        .user-welcome {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">🏨 Hotel Recommendations</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/search">Search</a>
+                <a class="nav-link" href="/recommendations">My Recommendations</a>
+                <a class="nav-link" href="/profile">Profile</a>
+                <a class="nav-link" href="#" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Where would you like to stay?</h1>
+            <p class="lead">Discover amazing hotels with AI-powered recommendations</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Search Container -->
+        <div class="search-container">
+            <div id="userWelcome" class="user-welcome mb-4">
+                <h4>Welcome back, <span id="userName">User</span>! 👋</h4>
+                <p class="mb-0">Ready to find your perfect hotel? Start by searching for your destination below.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <h3 class="mb-3">🌍 Search Hotels by Location</h3>
+                    <form id="locationSearchForm">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control form-control-lg" id="locationInput" 
+                                   placeholder="Enter city, state, or country (e.g., 'New York', 'Paris', 'Tokyo')">
+                            <button class="btn btn-primary btn-lg" type="submit">
+                                <span id="searchBtnText">🔍 Search Hotels</span>
+                                <span id="searchBtnLoading" class="d-none">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>Searching...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Quick Search Buttons -->
+                    <div class="mb-4">
+                        <h6>Quick searches:</h6>
+                        <div id="quickSearchBtns">
+                            <!-- Buttons will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Recent Searches -->
+                    <div id="recentSearches" class="d-none">
+                        <h6>Your recent searches:</h6>
+                        <div id="recentSearchList">
+                            <!-- Recent searches will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>🎯 Advanced Options</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Search Radius</label>
+                                <select class="form-select" id="searchRadius">
+                                    <option value="2000">2 km</option>
+                                    <option value="5000" selected>5 km</option>
+                                    <option value="10000">10 km</option>
+                                    <option value="20000">20 km</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Hotel Type</label>
+                                <select class="form-select" id="hotelType">
+                                    <option value="lodging">All Hotels</option>
+                                    <option value="hotel">Hotels Only</option>
+                                    <option value="resort">Resorts</option>
+                                    <option value="motel">Motels</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Destinations -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4">🌟 Popular Destinations</h3>
+                <div id="popularDestinations" class="row">
+                    <!-- Popular destinations will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="searchResults" class="d-none mt-5">
+            <h3 class="mb-4">🏨 Hotels Found</h3>
+            <div id="hotelsContainer" class="row">
+                <!-- Hotel results will be displayed here -->
+            </div>
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="d-none mt-5">
+            <div class="alert alert-info text-center">
+                <h4>No hotels found</h4>
+                <p>Try searching for a different location or adjusting your search criteria.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps Integration (if needed) -->
+    {% if config.GOOGLE_MAPS_API_KEY %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_MAPS_API_KEY }}&libraries=places&loading=async" async defer></script>
+    {% endif %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        class DashboardApp {
+            constructor() {
+                this.apiBase = '/api';
+                this.authToken = localStorage.getItem('authToken');
+                this.currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                this.autocomplete = null;
+                this.init();
+            }
+
+            init() {
+                this.checkAuth();
+                this.setupEventListeners();
+                this.loadUserData();
+                this.loadPopularDestinations();
+                this.loadRecentSearches();
+                this.setupGoogleMapsAutocomplete();
+                this.createQuickSearchButtons();
+            }
+
+            checkAuth() {
+                if (!this.authToken) {
+                    window.location.href = '/login';
+                    return;
+                }
+            }
+
+            setupEventListeners() {
+                // Location search form
+                document.getElementById('locationSearchForm').addEventListener('submit', (e) => {
+                    this.handleLocationSearch(e);
+                });
+
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                    this.handleLogout(e);
+                });
+
+                // Location input for auto-suggestions
+                const locationInput = document.getElementById('locationInput');
+                locationInput.addEventListener('input', this.debounce(() => {
+                    this.handleLocationInput();
+                }, 300));
+            }
+
+            setupGoogleMapsAutocomplete() {
+                try {
+                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                        const input = document.getElementById('locationInput');
+                        this.autocomplete = new google.maps.places.Autocomplete(input, {
+                            types: ['(cities)'],
+                            fields: ['place_id', 'name', 'formatted_address']
+                        });
+                    } else {
+                        console.log('Google Maps API not available, using fallback search');
+                    }
+                } catch (error) {
+                    console.warn('Google Maps autocomplete setup failed:', error);
+                }
+            }
+
+            loadUserData() {
+                const userName = this.currentUser.username || 'User';
+                document.getElementById('userName').textContent = userName;
+            }
+
+            async loadPopularDestinations() {
+                try {
+                    const response = await this.apiCall('/google/popular-locations', 'GET');
+                    this.displayPopularDestinations(response.popular_locations);
+                } catch (error) {
+                    console.error('Failed to load popular destinations:', error);
+                }
+            }
+
+            async loadRecentSearches() {
+                try {
+                    const response = await this.apiCall('/google/user/search-history', 'GET');
+                    if (response.search_history && response.search_history.length > 0) {
+                        this.displayRecentSearches(response.search_history);
+                    }
+                } catch (error) {
+                    console.error('Failed to load recent searches:', error);
+                }
+            }
+
+            createQuickSearchButtons() {
+                const quickLocations = [
+                    'New York', 'Los Angeles', 'London', 'Paris', 'Tokyo', 'Dubai'
+                ];
+                
+                const container = document.getElementById('quickSearchBtns');
+                container.innerHTML = quickLocations.map(location => 
+                    `<button type="button" class="btn btn-outline-primary quick-search-btn" onclick="app.quickSearch('${location}')">${location}</button>`
+                ).join('');
+            }
+
+            displayPopularDestinations(destinations) {
+                const container = document.getElementById('popularDestinations');
+                container.innerHTML = destinations.map(dest => `
+                    <div class="col-md-4 col-lg-2 mb-4">
+                        <div class="card location-card h-100" onclick="app.quickSearch('${dest.name}')">
+                            <div class="location-image" style="background-image: url('https://via.placeholder.com/300x200/667eea/ffffff?text=${encodeURIComponent(dest.name.split(',')[0])}')"></div>
+                            <div class="card-body text-center">
+                                <h6 class="card-title">${dest.name.split(',')[0]}</h6>
+                                <small class="text-muted">${dest.country}</small>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            displayRecentSearches(searches) {
+                const container = document.getElementById('recentSearchList');
+                document.getElementById('recentSearches').classList.remove('d-none');
+                
+                container.innerHTML = searches.map(search => 
+                    `<button type="button" class="btn btn-outline-secondary quick-search-btn" onclick="app.quickSearch('${search.location}')">${search.location}</button>`
+                ).join('');
+            }
+
+            async handleLocationSearch(e) {
+                e.preventDefault();
+                const location = document.getElementById('locationInput').value.trim();
+                
+                if (!location) {
+                    this.showAlert('Please enter a location to search', 'warning');
+                    return;
+                }
+
+                await this.searchHotels(location);
+            }
+
+            async quickSearch(location) {
+                document.getElementById('locationInput').value = location;
+                await this.searchHotels(location);
+            }
+
+            async searchHotels(location) {
+                this.showSearchLoading(true);
+                this.hideResults();
+
+                try {
+                    // First try Google API
+                    const radius = document.getElementById('searchRadius').value;
+                    const hotelType = document.getElementById('hotelType').value;
+
+                    let response;
+                    try {
+                        response = await this.apiCall('/google/search-hotels', 'POST', {
+                            location: location,
+                            radius: parseInt(radius),
+                            type: hotelType
+                        });
+                    } catch (googleError) {
+                        console.warn('Google API failed, trying smart recommendations:', googleError);
+                        // Fallback to smart recommendations API
+                        const userId = this.currentUser.id || 11;
+                        response = await this.apiCall(`/smart/personalized/${userId}?location=${encodeURIComponent(location)}&limit=12`, 'GET');
+                        
+                        if (response.recommendations) {
+                            // Transform recommendations to hotel format
+                            response.hotels = response.recommendations.map(rec => ({
+                                id: rec.hotel_id,
+                                place_id: `hotel_${rec.hotel_id}`, // Use hotel_id as place_id for local hotels
+                                name: rec.hotel.name,
+                                location: rec.hotel.location,
+                                rating: rec.hotel.rating,
+                                total_reviews: rec.hotel.total_reviews,
+                                price_range: rec.hotel.price_range,
+                                price_level: rec.hotel.price_level,
+                                source: 'smart_recommendations'
+                            }));
+                        }
+                    }
+
+                    if (response.hotels && response.hotels.length > 0) {
+                        this.displayHotels(response.hotels, location);
+                        this.saveSearch(location);
+                    } else {
+                        this.showNoResults();
+                    }
+
+                } catch (error) {
+                    console.error('All search methods failed:', error);
+                    this.showAlert('Search temporarily unavailable. Please try again later.', 'warning');
+                    this.showNoResults();
+                } finally {
+                    this.showSearchLoading(false);
+                }
+            }
+
+            displayHotels(hotels, searchLocation) {
+                const container = document.getElementById('hotelsContainer');
+                document.getElementById('searchResults').classList.remove('d-none');
+                
+                container.innerHTML = hotels.map(hotel => `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 hotel-card">
+                            <div class="card-body">
+                                <h5 class="card-title">${this.escapeHtml(hotel.name)}</h5>
+                                <p class="card-text text-muted small">${this.escapeHtml(hotel.location)}</p>
+                                
+                                <div class="mb-2">
+                                    <span class="text-warning">${'⭐'.repeat(Math.floor(hotel.rating || 0))} ${(hotel.rating || 0).toFixed(1)}</span>
+                                    <span class="text-muted small ms-1">(${hotel.total_reviews || 0} reviews)</span>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <span class="badge bg-primary">${hotel.price_range || 'Standard'}</span>
+                                    ${hotel.types && hotel.types.includes('spa') ? '<span class="badge bg-info ms-1">Spa</span>' : ''}
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Price Level: ${hotel.price_level || 'N/A'}</small>
+                                    <button class="btn btn-primary btn-sm" onclick="app.viewHotelDetails('${hotel.place_id || hotel.id}')">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Scroll to results
+                document.getElementById('searchResults').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+
+            viewHotelDetails(placeId) {
+                // Store the place ID and redirect to hotel details page
+                localStorage.setItem('currentHotelPlaceId', placeId);
+                window.location.href = `/hotel/${placeId}`;
+            }
+
+            async saveSearch(location) {
+                try {
+                    await this.apiCall('/google/user/save-search', 'POST', {
+                        location: location,
+                        type: 'location'
+                    });
+                } catch (error) {
+                    console.error('Failed to save search:', error);
+                }
+            }
+
+            showSearchLoading(show) {
+                const btnText = document.getElementById('searchBtnText');
+                const btnLoading = document.getElementById('searchBtnLoading');
+                const submitBtn = document.querySelector('#locationSearchForm button[type="submit"]');
+                
+                if (show) {
+                    btnText.classList.add('d-none');
+                    btnLoading.classList.remove('d-none');
+                    submitBtn.disabled = true;
+                } else {
+                    btnText.classList.remove('d-none');
+                    btnLoading.classList.add('d-none');
+                    submitBtn.disabled = false;
+                }
+            }
+
+            hideResults() {
+                document.getElementById('searchResults').classList.add('d-none');
+                document.getElementById('noResults').classList.add('d-none');
+            }
+
+            showNoResults() {
+                document.getElementById('noResults').classList.remove('d-none');
+                document.getElementById('noResults').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+
+            handleLogout(e) {
+                e.preventDefault();
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                window.location.href = '/login';
+            }
+
+            // Utility methods
+            async apiCall(endpoint, method = 'GET', body = null) {
+                const config = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.authToken}`
+                    }
+                };
+
+                if (body) {
+                    config.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(this.apiBase + endpoint, config);
+                
+                if (response.status === 401) {
+                    this.handleLogout();
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            }
+
+            showAlert(message, type = 'info') {
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${this.escapeHtml(message)}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                const container = document.querySelector('.container');
+                container.insertAdjacentHTML('afterbegin', alertHtml);
+                
+                setTimeout(() => {
+                    const alert = container.querySelector('.alert');
+                    if (alert) alert.remove();
+                }, 5000);
+            }
+
+            escapeHtml(text) {
+                if (!text) return '';
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.toString().replace(/[&<>"']/g, (m) => map[m]);
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+
+        // Initialize dashboard app
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app = new DashboardApp();
+        });
+    </script>
+</body>
+</html>

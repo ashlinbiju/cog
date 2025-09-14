@@ -1,0 +1,62 @@
+[
+  {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "age": 28,
+    "location": "New York, NY",
+    "preferences": {
+      "price_range": "medium",
+      "location": "urban",
+      "amenities": ["wifi", "gym", "breakfast"]
+    }
+  },
+  {
+    "username": "jane_smith",
+    "email": "jane@example.com",
+    "password": "password123",
+    "age": 35,
+    "location": "Los Angeles, CA",
+    "preferences": {
+      "price_range": "high",
+      "location": "beach",
+      "amenities": ["pool", "spa", "restaurant"]
+    }
+  },
+  {
+    "username": "bob_wilson",
+    "email": "bob@example.com",
+    "password": "password123",
+    "age": 42,
+    "location": "Chicago, IL",
+    "preferences": {
+      "price_range": "medium",
+      "location": "business",
+      "amenities": ["wifi", "business_center", "parking"]
+    }
+  },
+  {
+    "username": "alice_brown",
+    "email": "alice@example.com",
+    "password": "password123",
+    "age": 31,
+    "location": "Miami, FL",
+    "preferences": {
+      "price_range": "high",
+      "location": "beach",
+      "amenities": ["pool", "beach_access", "restaurant"]
+    }
+  },
+  {
+    "username": "charlie_davis",
+    "email": "charlie@example.com",
+    "password": "password123",
+    "age": 26,
+    "location": "Austin, TX",
+    "preferences": {
+      "price_range": "low",
+      "location": "urban",
+      "amenities": ["wifi", "breakfast"]
+    }
+  }
+]

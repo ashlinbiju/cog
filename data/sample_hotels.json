@@ -1,0 +1,90 @@
+[
+  {
+    "name": "Grand Plaza Hotel",
+    "location": "New York, NY",
+    "description": "Luxury hotel in the heart of Manhattan with stunning city views and world-class amenities.",
+    "amenities": ["wifi", "gym", "spa", "restaurant", "room_service", "business_center", "concierge"],
+    "price_range": "high",
+    "rating": 4.5,
+    "total_reviews": 342,
+    "category": "luxury",
+    "star_rating": 5
+  },
+  {
+    "name": "Sunset Beach Resort",
+    "location": "Miami, FL",
+    "description": "Beautiful beachfront resort with direct ocean access and tropical atmosphere.",
+    "amenities": ["pool", "beach_access", "restaurant", "spa", "wifi", "parking", "bar"],
+    "price_range": "high",
+    "rating": 4.3,
+    "total_reviews": 287,
+    "category": "leisure",
+    "star_rating": 4
+  },
+  {
+    "name": "Downtown Business Hotel",
+    "location": "Chicago, IL",
+    "description": "Modern hotel perfect for business travelers with excellent meeting facilities.",
+    "amenities": ["wifi", "business_center", "gym", "restaurant", "parking", "meeting_rooms"],
+    "price_range": "medium",
+    "rating": 4.1,
+    "total_reviews": 156,
+    "category": "business",
+    "star_rating": 4
+  },
+  {
+    "name": "Mountain View Lodge",
+    "location": "Denver, CO",
+    "description": "Cozy lodge with stunning mountain views and outdoor activities.",
+    "amenities": ["wifi", "parking", "restaurant", "hiking_trails", "fireplace", "bar"],
+    "price_range": "medium",
+    "rating": 4.2,
+    "total_reviews": 98,
+    "category": "leisure",
+    "star_rating": 3
+  },
+  {
+    "name": "Budget Inn Express",
+    "location": "Austin, TX",
+    "description": "Clean and affordable accommodation with essential amenities.",
+    "amenities": ["wifi", "parking", "breakfast"],
+    "price_range": "low",
+    "rating": 3.8,
+    "total_reviews": 67,
+    "category": "budget",
+    "star_rating": 2
+  },
+  {
+    "name": "Ocean View Suites",
+    "location": "San Diego, CA",
+    "description": "Spacious suites with panoramic ocean views and modern amenities.",
+    "amenities": ["pool", "beach_access", "wifi", "kitchen", "parking", "restaurant"],
+    "price_range": "high",
+    "rating": 4.4,
+    "total_reviews": 201,
+    "category": "leisure",
+    "star_rating": 4
+  },
+  {
+    "name": "Historic Inn",
+    "location": "Boston, MA",
+    "description": "Charming historic hotel in downtown Boston with classic elegance.",
+    "amenities": ["wifi", "restaurant", "bar", "concierge", "parking"],
+    "price_range": "medium",
+    "rating": 4.0,
+    "total_reviews": 134,
+    "category": "leisure",
+    "star_rating": 3
+  },
+  {
+    "name": "Tech Hub Hotel",
+    "location": "San Francisco, CA",
+    "description": "Modern hotel designed for tech professionals with high-speed internet and workspaces.",
+    "amenities": ["high_speed_wifi", "business_center", "gym", "restaurant", "meeting_rooms"],
+    "price_range": "high",
+    "rating": 4.3,
+    "total_reviews": 189,
+    "category": "business",
+    "star_rating": 4
+  }
+]
