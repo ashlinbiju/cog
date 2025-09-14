@@ -15,3 +15,4 @@ vaderSentiment>=3.3
 googlemaps>=4.10
 geopy>=2.4
 folium>=0.15
+Flask-Migrate>=4.0.5
